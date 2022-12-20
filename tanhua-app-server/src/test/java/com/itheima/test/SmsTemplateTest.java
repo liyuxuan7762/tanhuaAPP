@@ -1,5 +1,6 @@
 package com.itheima.test;
 
+import com.tanhua.autoconfig.template.EmailTemplate;
 import com.tanhua.autoconfig.template.SmsTemplate;
 import com.tanhua.server.AppServerApplication;
 import org.junit.Test;
@@ -16,9 +17,12 @@ public class SmsTemplateTest {
     @Autowired
     private SmsTemplate smsTemplate;
 
+    @Autowired
+    private EmailTemplate emailTemplate;
+
     //测试
     @Test
     public void testSendSms() {
-        smsTemplate.sendSms("18618412321","4567");
+        emailTemplate.sendCode("776239423@qq.com", "1234");
     }
 }
