@@ -23,4 +23,16 @@ public class LoginController {
         return ResponseEntity.ok(null);
     }
 
+    @PostMapping("/loginVerification")
+    public ResponseEntity loginVerification(@RequestBody Map map) {
+        // 1.解析参数
+        String phone = map.get("phone").toString();
+        String code = map.get("verificationCode").toString();
+        // 2.调用Service方法
+        Map retMap = this.userService.loginVerification(phone, code);
+        // 3.返回结果
+        return ResponseEntity.ok(retMap);
+    }
+
+
 }

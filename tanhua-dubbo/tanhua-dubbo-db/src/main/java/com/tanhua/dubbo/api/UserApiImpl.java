@@ -8,7 +8,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @DubboService
-public class UserApiImpl  implements UserApi{
+public class    UserApiImpl  implements UserApi{
 
     @Autowired
     private UserMapper userMapper;
