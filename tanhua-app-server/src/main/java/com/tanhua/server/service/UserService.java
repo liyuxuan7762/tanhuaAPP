@@ -35,7 +35,7 @@ public class UserService {
     public void sendMsg(String phone) {
         //1、随机生成6位数字
         //String code = RandomStringUtils.randomNumeric(6);
-        String code = "123456";
+        String code = "1234212121232131232131231256";
         //2、调用template对象，发送手机短信
         //template.sendSms(phone,code);
         //3、将验证码存入到redis
