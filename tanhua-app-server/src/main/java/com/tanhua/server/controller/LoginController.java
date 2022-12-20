@@ -28,7 +28,7 @@ public class LoginController {
         String phone =(String) map.get("phone");
         userService.sendMsg(phone);
         //return ResponseEntity.status(500).body("出错啦");
-        return ResponseEntity.ok(null); //正常返回状态码200
+        return ResponseEntity.ok(null); //正常返回状态码2001
     }
 
     /**
