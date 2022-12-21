@@ -17,9 +17,9 @@ public class UserInfo implements Serializable {
 
     /**
      * 由于userinfo表和user表之间是一对一关系
-     *   userInfo的id来源于user表的id
+     * userInfo的id来源于user表的id
      */
-    @TableId(type= IdType.INPUT)
+    @TableId(type = IdType.INPUT)
     private Long id; //用户id
     private String nickname; //昵称
     private String avatar; //用户头像

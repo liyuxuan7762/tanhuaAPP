@@ -15,4 +15,7 @@ public interface UserInfoApi {
      * @param userInfo
      */
     void update(UserInfo userInfo);
+
+    UserInfo getUserInfoById(Long userID);
+
 }

@@ -25,7 +25,7 @@ public class OssTest {
 
     @Test
     public void testTemplateUpload() throws IOException {
-        String path = "C:\\Users\\李宇轩\\Pictures\\unsplash-3NI9aJGOl-4.png";
+        String path = "C:\\Users\\李宇轩\\Desktop\\1.jpg";
         InputStream inputStream = Files.newInputStream(new File(path).toPath());
         String url = ossTemplate.uploadFile(path, inputStream);
         System.out.println(url);

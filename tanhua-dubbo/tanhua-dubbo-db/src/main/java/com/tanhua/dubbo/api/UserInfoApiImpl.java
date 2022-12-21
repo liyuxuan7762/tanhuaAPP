@@ -20,4 +20,9 @@ public class UserInfoApiImpl implements UserInfoApi {
     public void update(UserInfo userInfo) {
         this.userInfoMapper.updateById(userInfo);
     }
+
+    @Override
+    public UserInfo getUserInfoById(Long userID) {
+        return this.userInfoMapper.selectById(userID);
+    }
 }

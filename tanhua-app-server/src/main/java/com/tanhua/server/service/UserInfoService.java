@@ -4,7 +4,9 @@ import com.tanhua.autoconfig.template.AipFaceTemplate;
 import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.vo.UserInfoVo;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +29,7 @@ public class UserInfoService {
         this.userInfoApi.save(userInfo);
     }
 
-    public void uploadAvatar(Integer id, MultipartFile headPhoto) {
+    public void uploadAvatar(Long id, MultipartFile headPhoto) {
         // 1. 将文件上传到阿里云OSS
         String imageUrl = null;
         try {
@@ -42,8 +44,20 @@ public class UserInfoService {
         }
         // 3. 更新用户信息
         UserInfo userInfo = new UserInfo();
-        userInfo.setId(Long.valueOf(id));
+        userInfo.setId(id);
         userInfo.setAvatar(imageUrl);
+        this.userInfoApi.update(userInfo);
+    }
+
+    public UserInfoVo getUserInfoById(Long userID) {
+        UserInfo userInfo = this.userInfoApi.getUserInfoById(userID);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtils.copyProperties(userInfo, userInfoVo); // 只会拷贝名字相同且类型相同的属性
+        userInfoVo.setAge(userInfo.getAge().toString());
+        return userInfoVo;
+    }
+
+    public void updateUserInfo(UserInfo userInfo) {
         this.userInfoApi.update(userInfo);
     }
 }
