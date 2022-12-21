@@ -20,7 +20,7 @@ public class AipFaceTemplate {
      * @param imageUrl 图像URL地址
      * @return
      */
-    public String FaceCheck(String imageUrl) {
+    public boolean faceCheck(String imageUrl) {
 
         HashMap<String, String> options = new HashMap<String, String>();
         options.put("face_field", "age");
@@ -40,6 +40,6 @@ public class AipFaceTemplate {
 
         // 人脸检测
         JSONObject res = client.detect(image, imageType, options);
-        return res.get("error_code").toString();
+        return "0".equals(res.get("error_code").toString()) ? true : false;
     }
 }

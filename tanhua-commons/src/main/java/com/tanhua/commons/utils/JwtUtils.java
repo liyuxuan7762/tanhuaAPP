@@ -31,7 +31,7 @@ public class JwtUtils {
     /**
      * 获取Token中的claims信息
      */
-    private static Claims getClaims(String token) {
+    public static Claims getClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(TOKEN_SECRET)
                 .parseClaimsJws(token).getBody();
