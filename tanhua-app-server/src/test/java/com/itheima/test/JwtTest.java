@@ -23,9 +23,7 @@ public class JwtTest {
                 .compact();
         System.out.println(token);
     }
-
     //解析token
-
     /**
      * SignatureException : token不合法
      * ExpiredJwtException：token已过期
@@ -47,7 +45,5 @@ public class JwtTest {
         } catch (ExpiredJwtException e) {
             System.out.println("token已过期");
         }
-
-
     }
 }

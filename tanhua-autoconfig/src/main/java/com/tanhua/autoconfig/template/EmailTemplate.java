@@ -17,7 +17,7 @@ public class EmailTemplate {
         this.emailProperties = emailProperties;
     }
 
-    public boolean sendMailByQQMail(String to, String text, String title) {
+    private boolean sendMailByQQMail(String to, String text, String title) {
 
         try {
             final Properties props = new Properties();

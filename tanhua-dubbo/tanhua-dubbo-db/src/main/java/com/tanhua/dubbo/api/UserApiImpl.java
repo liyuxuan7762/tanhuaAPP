@@ -14,6 +14,7 @@ public class    UserApiImpl  implements UserApi{
     private UserMapper userMapper;
 
     //根据手机号码查询用户
+    @Override
     public User findByMobile(String mobile) {
         QueryWrapper<User> qw = new QueryWrapper<>();
         qw.eq("mobile",mobile);

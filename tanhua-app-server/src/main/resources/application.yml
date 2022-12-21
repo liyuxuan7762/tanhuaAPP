@@ -25,3 +25,13 @@ tanhua:
   email:
     user: 776239423@qq.com
     password: ysdimzjzxfqmbdeg
+  oss:
+    endpoint: oss-cn-qingdao.aliyuncs.com
+    accessKeyId: LTAI5t8eyt6zxHZuE4QTcodc
+    accessKeySecret: 8L3khm40RRbhZGn08s3ua3Wr8rMhjf
+    bucket: tanhuaossservice
+    url: https://tanhuaossservice.oss-cn-qingdao.aliyuncs.com/
+  face:
+    appId: 29202058
+    apiKey: ptSnMDAm5LB1AsbiMidBZ4we
+    secretKey: lAaU81AxY9BxP1ql4XdSGe2MF8ND0YK5

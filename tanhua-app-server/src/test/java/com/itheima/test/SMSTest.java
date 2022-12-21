@@ -5,7 +5,7 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
 import com.aliyun.teaopenapi.models.Config;
 
-public class Sample {
+public class SMSTest {
 
 
     public static void main(String[] args_) throws Exception {
