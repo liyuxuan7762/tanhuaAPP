@@ -4,6 +4,8 @@ import com.tanhua.autoconfig.template.EmailTemplate;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
+import com.tanhua.model.vo.ErrorResult;
+import com.tanhua.server.exception.BusinessException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -43,7 +45,7 @@ public class UserService {
         // 2.比较验证码
         if (StringUtils.isEmpty(redisCode) || !redisCode.equals(code)) {
             // 验证码无效或者验证码错误
-            throw new RuntimeException("验证码失效");
+            throw new BusinessException(ErrorResult.loginError());
         }
         // 3.判断用户是否已经存在
         User user = userApi.findByMobile(phone);

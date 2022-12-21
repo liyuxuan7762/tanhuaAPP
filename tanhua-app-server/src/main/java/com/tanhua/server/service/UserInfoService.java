@@ -4,7 +4,9 @@ import com.tanhua.autoconfig.template.AipFaceTemplate;
 import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.UserInfoVo;
+import com.tanhua.server.exception.BusinessException;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -35,12 +37,12 @@ public class UserInfoService {
         try {
             imageUrl = ossTemplate.uploadFile(headPhoto.getOriginalFilename(), headPhoto.getInputStream());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BusinessException(ErrorResult.error());
         }
         // 2. 调用百度人脸识别判断是否是人脸，如果不是抛出异常
         boolean check = aipFaceTemplate.faceCheck(imageUrl);
         if (!check) {
-            throw new RuntimeException("头像不合法");
+            throw new BusinessException(ErrorResult.faceError());
         }
         // 3. 更新用户信息
         UserInfo userInfo = new UserInfo();
