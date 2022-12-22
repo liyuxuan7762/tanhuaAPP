@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://192.168.136.160:27017/testdb
+  application:
+    name: tanhua-dubbo-mongo
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.136.160:8848
