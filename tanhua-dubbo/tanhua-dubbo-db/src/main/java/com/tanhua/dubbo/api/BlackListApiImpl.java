@@ -18,7 +18,6 @@ public class BlackListApiImpl implements BlackListApi{
     @Override
     public IPage<UserInfo> getBlackList(Long userId, int page, int size) {
         Page pageInfo = new Page(page, size);
-
         return this.blackListMapper.getBlackList(userId, pageInfo);
     }
 

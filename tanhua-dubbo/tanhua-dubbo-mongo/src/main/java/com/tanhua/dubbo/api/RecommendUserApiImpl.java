@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 public class RecommendUserApiImpl implements RecommendUserApi {
     @Resource
     private MongoTemplate mongoTemplate;
-
     @Override
     public RecommendUser getTodayBest(Long userId) {
         // 根据toUserId字段查询，然后根据分数排序，取分数最高的一个

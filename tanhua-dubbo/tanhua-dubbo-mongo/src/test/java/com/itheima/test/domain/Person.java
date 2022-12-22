@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @Document(value="tb_person")
 public class Person {
-
     @Id
     private ObjectId id;
     @Field("myname")

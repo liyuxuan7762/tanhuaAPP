@@ -45,7 +45,7 @@ public class SettingsController {
     }
 
     /**
-     * 更改用户设置
+     * 更改通知设置
      *
      * @param map
      * @return
@@ -74,6 +74,11 @@ public class SettingsController {
         return ResponseEntity.ok(pageResult);
     }
 
+    /**
+     * 移除黑名单
+     * @param uid
+     * @return
+     */
     @DeleteMapping("/blacklist/{uid}")
     public ResponseEntity removeUserFromBlackList(@PathVariable(name = "uid") Long uid) {
         // 1.调用service方法移除童虎

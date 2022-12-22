@@ -64,6 +64,10 @@ public class SettingsService {
         }
     }
 
+    /**
+     * 保存通知设置
+     * @param map
+     */
     public void saveOrUpdateSettings(Map map) {
         // 0. 解析数据
         Boolean likeNotification = (Boolean) map.get("likeNotification");
