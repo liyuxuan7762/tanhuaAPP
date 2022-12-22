@@ -23,8 +23,7 @@ public class UserInfoController {
      * @return
      */
     @PostMapping("/loginReginfo")
-    public ResponseEntity loginReginfo(@RequestBody UserInfo userInfo,
-                                       @RequestHeader("Authorization") String token) {
+    public ResponseEntity loginReginfo(@RequestBody UserInfo userInfo) {
         // 3. 将ID设置到userInfo中
         userInfo.setId(UserHolder.getUserId());
         // 4. 调用service方法保存数据
@@ -33,9 +32,13 @@ public class UserInfoController {
         return ResponseEntity.ok(null);
     }
 
+    /**
+     * 完善个人信息之上传头像
+     * @param headPhoto
+     * @return
+     */
     @PostMapping("/loginReginfo/head")
-    public ResponseEntity head(MultipartFile headPhoto,
-                               @RequestHeader("Authorization") String token) {
+    public ResponseEntity head(MultipartFile headPhoto) {
 
         // 3. 调用service将头像上传并进行人像判断
         this.userInfoService.uploadAvatar(UserHolder.getUserId(), headPhoto);
