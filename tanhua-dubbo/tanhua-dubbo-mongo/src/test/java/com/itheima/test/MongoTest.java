@@ -2,7 +2,7 @@ package com.itheima.test;
 
 
 import com.itheima.test.domain.Person;
-import com.tanhua.mongo.MongoApplication;
+import com.tanhua.dubbo.MongoApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.tanhua.mongo;
+package com.tanhua.dubbo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

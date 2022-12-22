@@ -1,10 +1,20 @@
+server:
+  port: 18082
 spring:
-  data:
-    mongodb:
-      uri: mongodb://192.168.136.160:27017/testdb
   application:
     name: tanhua-dubbo-mongo
   cloud:
     nacos:
       discovery:
         server-addr: 192.168.136.160:8848
+  data:
+    mongodb:
+      uri: mongodb://192.168.136.160:27017/tanhua
+dubbo:
+  protocol:
+    name: dubbo
+    port: 20882
+  registry:
+    address: spring-cloud://localhost
+  scan:
+    base-packages: com.tanhua.dubbo.api  #dubbo中包扫描
