@@ -26,4 +26,12 @@ public class    UserApiImpl  implements UserApi{
         userMapper.insert(user);
         return user.getId();
     }
+
+    @Override
+    public void updatePhone(String phone, Long userId) {
+        User user = new User();
+        user.setId(userId);
+        user.setMobile(phone);
+        this.userMapper.updateById(user);
+    }
 }

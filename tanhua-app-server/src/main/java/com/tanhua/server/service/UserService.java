@@ -71,4 +71,19 @@ public class UserService {
         retMap.put("isNew", isNew);
         return retMap;
     }
+
+    public boolean checkVerificationCode(String code, String userPhone) {
+        // 1.从Redis中获取到验证码
+        String redisCode = this.redisTemplate.opsForValue().get(VERIFICATION_CODE_PREFIX + userPhone);
+        // 2.比较验证码
+        if (StringUtils.isEmpty(redisCode) || !redisCode.equals(code)) {
+            // 验证码无效或者验证码错误
+            throw new BusinessException(ErrorResult.loginError());
+        }
+        return true;
+    }
+
+    public void updatePhone(String phone, Long userId) {
+        this.userApi.updatePhone(phone, userId);
+    }
 }

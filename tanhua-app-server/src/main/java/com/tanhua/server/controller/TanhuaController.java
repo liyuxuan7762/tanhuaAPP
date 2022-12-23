@@ -1,5 +1,7 @@
 package com.tanhua.server.controller;
 
+import com.tanhua.model.vo.PageResult;
+import com.tanhua.model.vo.RecommendUserDto;
 import com.tanhua.model.vo.TodayBest;
 import com.tanhua.server.service.TanhuaService;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,7 @@ public class TanhuaController {
     /**
      * 查询今日佳人
      *
-     * @return
+     * @return 推荐佳人对象
      */
     @GetMapping("/todayBest")
     public ResponseEntity getTodayBest() {
@@ -27,5 +29,19 @@ public class TanhuaController {
         TodayBest vo = this.tanhuaService.getTodayBest();
         // 2. 将结果返回
         return ResponseEntity.ok(vo);
+    }
+
+    /**
+     * 获取推荐列表
+     * @return 推荐列表分页对象
+     */
+    @GetMapping("/recommendation")
+    public ResponseEntity recommendation(RecommendUserDto recommendUserDto) {
+        // 1. 条用service获取分页结果
+        recommendUserDto.setCity("");
+        recommendUserDto.setAge(60);
+        PageResult result = this.tanhuaService.getRecommendationList(recommendUserDto);
+        // 2. 返回数据
+        return ResponseEntity.ok(result);
     }
 }

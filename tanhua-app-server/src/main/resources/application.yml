@@ -16,6 +16,8 @@ dubbo:    #dubbo配置
     address: spring-cloud://localhost
   consumer:
     check: false
+  cloud:
+    subscribed-services: tanhua-dubbo-db,tanhua-dubbo-mongo
 tanhua:
   sms:
     signName: 物流云商

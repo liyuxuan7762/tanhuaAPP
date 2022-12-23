@@ -7,4 +7,6 @@ public interface UserApi {
     User findByMobile(String mobile);
     //保存用户，返回用户id
     Long save(User user);
+
+    void updatePhone(String phone, Long userId);
 }
