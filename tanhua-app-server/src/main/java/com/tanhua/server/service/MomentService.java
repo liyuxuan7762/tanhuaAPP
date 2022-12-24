@@ -2,6 +2,7 @@ package com.tanhua.server.service;
 
 import cn.hutool.core.collection.CollUtil;
 import com.tanhua.autoconfig.template.OssTemplate;
+import com.tanhua.common.utils.Constants;
 import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
@@ -9,15 +10,16 @@ import com.tanhua.model.mongo.Movement;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.server.interceptor.UserHolder;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MomentService {
@@ -29,6 +31,9 @@ public class MomentService {
 
     @DubboReference
     private UserInfoApi userInfoApi;
+
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
 
 
     public void publish(Movement movement, MultipartFile[] files) throws IOException {
@@ -80,20 +85,71 @@ public class MomentService {
         if (CollUtil.isEmpty(movementList)) {
             return new PageResult();
         }
-        List<Long> friendIds = CollUtil.getFieldValues(movementList, "userId", Long.class);
-        // 4. 根据id查询好友的详细信息，得到一个集合
-        Map<Long, UserInfo> friendUserInfo = this.userInfoApi.getUserInfoByIds(friendIds, null);
-        // 5. 遍历动态集合，封装vo
-        List<MovementsVo> voList = new ArrayList<>();
-        for (Movement movement : movementList) {
-            // 获取到动态发布者的id
-            Long friendId = movement.getUserId();
-            UserInfo userInfo = friendUserInfo.get(friendId);
-            if (userInfo != null) {
-                voList.add(MovementsVo.init(userInfo, movement));
-            }
-        }
+        List<MovementsVo> voList = createMovementVo(movementList);
         // 6. 构建返回值
         return new PageResult(page, pagesize, 0, voList);
     }
+
+    private List<MovementsVo> createMovementVo(List<Movement> movementList) {
+        if (CollUtil.isEmpty(movementList)) {
+            // 如果为动态为空，那么说明已经到底了 那么直接返回一个空的vo集合即可
+            List<MovementsVo> list = new ArrayList<>();
+            return list;
+        } else {
+            List<Long> friendIds = CollUtil.getFieldValues(movementList, "userId", Long.class);
+            // 4. 根据id查询好友的详细信息，得到一个集合
+            Map<Long, UserInfo> friendUserInfo = this.userInfoApi.getUserInfoByIds(friendIds, null);
+            // 5. 遍历动态集合，封装vo
+            List<MovementsVo> voList = new ArrayList<>();
+            for (Movement movement : movementList) {
+                // 获取到动态发布者的id
+                Long friendId = movement.getUserId();
+                UserInfo userInfo = friendUserInfo.get(friendId);
+                if (userInfo != null) {
+                    MovementsVo init = MovementsVo.init(userInfo, movement);
+                    // 使用EmptyList 包报错 https://blog.csdn.net/fengbin111/article/details/105909654/
+                    voList.add(init);
+                }
+            }
+            return voList;
+        }
+
+    }
+
+    public PageResult getRecommendMovement(Integer page, Integer pagesize) {
+        // 1. 获取用户id
+        Long userId = UserHolder.getUserId();
+        // 2. 根据用户Id 到redis中查询数据 判断推荐信息是否存在
+        String key = Constants.MOVEMENTS_RECOMMEND + userId;
+        String recommendStr = redisTemplate.opsForValue().get(key);
+        List<Movement> movementList = Collections.emptyList();
+        if (StringUtils.isEmpty(recommendStr)) {
+            // 如果推荐列表为空，则随机生成记录
+            movementList = this.movementApi.getRandomRecommendMovement(pagesize);
+        } else {
+            // 3. 获取到pids，进行分页得到最终的动态列表
+            // 解析pid
+            String[] split = recommendStr.split(",");
+            // 判断是否还需要分页
+            if ((page - 1) * pagesize < split.length) {
+                List<Long> pids = Arrays.stream(split)
+                        .skip((page - 1) * pagesize)
+                        .limit(pagesize)
+                        .map(e -> Long.valueOf(e))
+                        .collect(Collectors.toList());
+
+                // 根据pids查询出所有的movement
+                movementList = this.movementApi.getMovementByPids(pids);
+            };
+        }
+        // 4. 封装vo
+        List<MovementsVo> movementsVoList = createMovementVo(movementList);
+        // 5. 封装返回值
+        return new PageResult(page, pagesize, 0, movementsVoList);
+    }
+
 }
+
+//java.lang.UnsupportedOperationException
+//        at java.util.AbstractList.add(AbstractList.java:148)
+//        at java.util.AbstractList.add(AbstractList.java:108)

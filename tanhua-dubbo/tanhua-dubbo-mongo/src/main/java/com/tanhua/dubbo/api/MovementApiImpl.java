@@ -10,6 +10,9 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Async;
@@ -100,11 +103,26 @@ public class MovementApiImpl implements MovementApi {
     }
 
     @Override
+    public List<Movement> getMovementByPids(List<Long> pids) {
+        Criteria criteria = Criteria.where("pid").in(pids);
+        Query query = new Query(criteria);
+        return this.mongoTemplate.find(query, Movement.class);
+    }
+
+    @Override
+    public List<Movement> getRandomRecommendMovement(Integer pagesize) {
+        TypedAggregation aggregation = Aggregation.newAggregation(Movement.class,
+                Aggregation.sample(pagesize));
+        AggregationResults<Movement> movements = mongoTemplate.aggregate(aggregation,Movement.class);
+        return movements.getMappedResults();
+    }
+
+
+    @Override
     public List<Friend> getFriendListByUserId(Long userId) {
         Criteria criteria = Criteria.where("userId").is(userId);
         Query query = new Query(criteria);
         return this.mongoTemplate.find(query, Friend.class);
     }
-
 
 }

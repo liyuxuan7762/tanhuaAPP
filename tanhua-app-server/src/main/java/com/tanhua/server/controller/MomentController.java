@@ -55,13 +55,28 @@ public class MomentController {
     }
 
     /**
-     * 查询当前登录用户的好友的动态
+     * 查看好友动态
+     * @param page 页号
+     * @param pagesize 页大小
      * @return
      */
     @GetMapping
     public ResponseEntity getFriendMovement(@RequestParam(defaultValue = "1") Integer page,
                                             @RequestParam(defaultValue = "5") Integer pagesize) {
         PageResult result = this.momentService.getFriendMovement(page,pagesize);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 获取推荐的动态
+     * @param page 页号
+     * @param pagesize 页大小
+     * @return
+     */
+    @GetMapping("/recommend")
+    public ResponseEntity getRecommendMovement(@RequestParam(defaultValue = "1") Integer page,
+                                               @RequestParam(defaultValue = "5") Integer pagesize) {
+        PageResult result = this.momentService.getRecommendMovement(page,pagesize);
         return ResponseEntity.ok(result);
     }
 }

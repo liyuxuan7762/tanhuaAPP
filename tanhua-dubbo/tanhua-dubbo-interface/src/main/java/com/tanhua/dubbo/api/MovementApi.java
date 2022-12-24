@@ -16,4 +16,8 @@ public interface MovementApi {
     PageResult getMovementByUserId(Long userId, Integer page, Integer pagesize);
 
     List<Movement> getFriendMovementsByUserId(Long userId, Integer page, Integer pagesize);
+
+    List<Movement> getMovementByPids(List<Long> pids);
+
+    List<Movement> getRandomRecommendMovement(Integer pagesize);
 }
