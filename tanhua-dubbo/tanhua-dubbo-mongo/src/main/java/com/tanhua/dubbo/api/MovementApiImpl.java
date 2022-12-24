@@ -1,11 +1,13 @@
 package com.tanhua.dubbo.api;
 
+import cn.hutool.core.collection.CollUtil;
 import com.tanhua.dubbo.utils.IdWorker;
 import com.tanhua.model.mongo.Friend;
 import com.tanhua.model.mongo.Movement;
 import com.tanhua.model.mongo.MovementTimeLine;
 import com.tanhua.model.vo.PageResult;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -76,7 +78,25 @@ public class MovementApiImpl implements MovementApi {
         Query query = new Query(criteria);
         query.skip((page - 1) * pagesize).limit(pagesize).with(Sort.by(Sort.Order.desc("created")));
         List<Movement> movementList = this.mongoTemplate.find(query, Movement.class);
-        return new PageResult(page, pagesize, 0L, movementList);
+        return new PageResult(page, pagesize, 0, movementList);
+    }
+
+    @Override
+    public List<Movement> getFriendMovementsByUserId(Long userId, Integer page, Integer pagesize) {
+        // 构建条件
+        Criteria criteria = Criteria.where("friendId").is(userId);
+        Query query = new Query(criteria);
+        query.skip((page - 1) * pagesize).limit(pagesize).with(Sort.by(Sort.Order.desc("created")));
+        List<MovementTimeLine> timeLineList = this.mongoTemplate.find(query, MovementTimeLine.class);
+
+        // 1. 根据查询到的TimeLine中的动态id，封装动态的集合
+        // 坑：注意 这个id的类型是ObjectId 不是Long
+        List<ObjectId> ids = CollUtil.getFieldValues(timeLineList, "movementId", ObjectId.class);
+
+        // 根据userId查询到动态
+        Query queryMovement = new Query(Criteria.where("id").in(ids));
+
+        return this.mongoTemplate.find(queryMovement, Movement.class);
     }
 
     @Override

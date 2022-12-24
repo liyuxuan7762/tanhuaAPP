@@ -38,12 +38,30 @@ public class MomentController {
         return  ResponseEntity.ok(null);
     }
 
+    /**
+     * 查询个人动态
+     * @param userId 登录用户ID
+     * @param page 页码
+     * @param pagesize 页大小
+     * @return
+     */
     @GetMapping("/all")
     public ResponseEntity getOwnMovement(Long userId,
                                          @RequestParam(defaultValue = "1") Integer page,
                                          @RequestParam(defaultValue = "5") Integer pagesize) {
         // 调用service方法
         PageResult result = this.momentService.getOwnMovement(userId, page, pagesize);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 查询当前登录用户的好友的动态
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity getFriendMovement(@RequestParam(defaultValue = "1") Integer page,
+                                            @RequestParam(defaultValue = "5") Integer pagesize) {
+        PageResult result = this.momentService.getFriendMovement(page,pagesize);
         return ResponseEntity.ok(result);
     }
 }

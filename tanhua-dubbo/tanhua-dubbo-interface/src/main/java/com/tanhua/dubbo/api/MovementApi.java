@@ -14,4 +14,6 @@ public interface MovementApi {
     void saveTimeLine(Movement movement, long createTime);
 
     PageResult getMovementByUserId(Long userId, Integer page, Integer pagesize);
+
+    List<Movement> getFriendMovementsByUserId(Long userId, Integer page, Integer pagesize);
 }

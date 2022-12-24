@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "movement_timeLine")
+@Document(collection = "movement_timeline")
 public class MovementTimeLine implements java.io.Serializable {
 
     private static final long serialVersionUID = 9096178416317502524L;
