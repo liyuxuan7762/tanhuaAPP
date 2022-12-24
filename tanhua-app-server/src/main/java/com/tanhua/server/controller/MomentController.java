@@ -2,6 +2,7 @@ package com.tanhua.server.controller;
 
 import com.tanhua.model.mongo.Movement;
 import com.tanhua.model.vo.ErrorResult;
+import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.service.MomentService;
@@ -79,4 +80,19 @@ public class MomentController {
         PageResult result = this.momentService.getRecommendMovement(page,pagesize);
         return ResponseEntity.ok(result);
     }
+
+    /**
+     * 查询动态的详情
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity getMovementDetail(@PathVariable(name = "id") String id) {
+        // 1. 调用方法
+        MovementsVo movementsVo = this.momentService.getMovementDetailById(id);
+        // 2. 返回数据
+        return ResponseEntity.ok(movementsVo);
+    }
+
+
 }

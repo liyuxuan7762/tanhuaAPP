@@ -117,6 +117,20 @@ public class MovementApiImpl implements MovementApi {
         return movements.getMappedResults();
     }
 
+    /**
+     * 根据动态的ID查询动态
+     * @param id
+     * @return
+     */
+    @Override
+    public Movement getMovementById(String id) {
+        // 注意 这里除了使用findById外，其他方法如果根据Id查询都需要封装成new ObjectId(id)
+        // 比如从时间线表中根据动态ID查询数据，这个时候因为查询的字段movementId不是主键，因此需要
+        // new ObjectId(movementId) 这样才可以
+        // 总之最好是查询的那个条件的数据类型和对应的实体类中类型一致
+        return mongoTemplate.findById(new ObjectId(id), Movement.class);
+    }
+
 
     @Override
     public List<Friend> getFriendListByUserId(Long userId) {

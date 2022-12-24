@@ -148,6 +148,15 @@ public class MomentService {
         return new PageResult(page, pagesize, 0, movementsVoList);
     }
 
+    public MovementsVo getMovementDetailById(String id) {
+        // 1. 根据ID查询得到Movement对象
+        Movement movement = this.movementApi.getMovementById(id);
+        // 2. 根据Movement的userId查询到该动态发布者的详细信息
+        Long userId = movement.getUserId();
+        UserInfo userInfo = this.userInfoApi.getUserInfoById(userId);
+        // 3. 封装Vo对象
+        return MovementsVo.init(userInfo, movement);
+    }
 }
 
 //java.lang.UnsupportedOperationException

@@ -20,4 +20,6 @@ public interface MovementApi {
     List<Movement> getMovementByPids(List<Long> pids);
 
     List<Movement> getRandomRecommendMovement(Integer pagesize);
+
+    Movement getMovementById(String id);
 }
