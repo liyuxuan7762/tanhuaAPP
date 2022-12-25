@@ -128,7 +128,7 @@ public class MovementApiImpl implements MovementApi {
         // 比如从时间线表中根据动态ID查询数据，这个时候因为查询的字段movementId不是主键，因此需要
         // new ObjectId(movementId) 这样才可以
         // 总之最好是查询的那个条件的数据类型和对应的实体类中类型一致
-        return mongoTemplate.findById(new ObjectId(id), Movement.class);
+        return mongoTemplate.findById(id, Movement.class);
     }
 
 

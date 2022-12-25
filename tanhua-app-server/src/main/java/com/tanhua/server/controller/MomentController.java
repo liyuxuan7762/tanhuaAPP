@@ -5,6 +5,7 @@ import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.server.exception.BusinessException;
+import com.tanhua.server.service.CommentService;
 import com.tanhua.server.service.MomentService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,9 @@ import java.io.IOException;
 public class MomentController {
     @Resource
     private MomentService momentService;
+
+    @Resource
+    private CommentService commentService;
 
     /**
      * 发送动态
@@ -88,10 +92,64 @@ public class MomentController {
      */
     @GetMapping("/{id}")
     public ResponseEntity getMovementDetail(@PathVariable(name = "id") String id) {
-        // 1. 调用方法
-        MovementsVo movementsVo = this.momentService.getMovementDetailById(id);
-        // 2. 返回数据
-        return ResponseEntity.ok(movementsVo);
+        if (id.equals("visitors")) {
+            return ResponseEntity.ok(null);
+        } else {
+            // 1. 调用方法
+            MovementsVo movementsVo = this.momentService.getMovementDetailById(id);
+            // 2. 返回数据
+            return ResponseEntity.ok(movementsVo);
+        }
+    }
+
+    /**
+     * 用户点赞
+     * @param movementId 动态Id
+     * @return 点赞之后最新的点赞数量
+     */
+    @GetMapping("/{id}/likeMovement")
+    public ResponseEntity like(@PathVariable(name = "id") String movementId) {
+        // 1. 调用Service方法完成点赞
+        Integer likeCount = this.commentService.like(movementId);
+        // 2. 返回结果
+        return ResponseEntity.ok(likeCount);
+    }
+
+    /**
+     * 取消点赞
+     * @param movementId 动态Id
+     * @return 取消点赞之后最新的点赞数量
+     */
+    @GetMapping("/dislikeMovement/{id}")
+    public ResponseEntity dislike(@PathVariable(name = "id") String movementId) {
+        // 1. 调用Service方法完成点赞
+        Integer likeCount = this.commentService.dislike(movementId);
+        // 2. 返回结果
+        return ResponseEntity.ok(likeCount);
+    }
+
+    /**
+     * 用户喜欢动态
+     * @param movementId 动态Id
+     * @return
+     */
+    @GetMapping("/{id}/love")
+    public ResponseEntity love(@PathVariable(name = "id") String movementId) {
+        // 调用Service方法完成喜欢
+        Integer count = this.commentService.love(movementId);
+        return ResponseEntity.ok(count);
+    }
+
+    /**
+     * 用户取消喜欢动态
+     * @param movementId 动态Id
+     * @return
+     */
+    @GetMapping("/{id}/unlove")
+    public ResponseEntity unlove(@PathVariable(name = "id") String movementId) {
+        // 调用Service方法完成喜欢
+        Integer count = this.commentService.unlove(movementId);
+        return ResponseEntity.ok(count);
     }
 
 

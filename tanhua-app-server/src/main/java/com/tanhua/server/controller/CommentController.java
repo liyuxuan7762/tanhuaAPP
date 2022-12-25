@@ -46,4 +46,31 @@ public class CommentController {
         // 2. 返回结果
         return ResponseEntity.ok(result);
     }
+
+    /**
+     * 点赞评论
+     * @param commentId 评论id
+     * @return
+     */
+    @GetMapping("/{id}/likeComment")
+    public ResponseEntity like(@PathVariable(name = "id") String commentId) {
+        // 调用Service方法保存
+        Integer count = this.commentService.likeComment(commentId);
+        // 返回结果
+        return ResponseEntity.ok(count);
+    }
+
+    /**
+     * 取消点赞评论
+     * @param commentId 评论id
+     * @return
+     */
+    @GetMapping("/{id}/dislikeComment")
+    public ResponseEntity dislike(@PathVariable(name = "id") String commentId) {
+        // 调用Service方法保存
+        Integer count = this.commentService.dislikeComment(commentId);
+        // 返回结果
+        return ResponseEntity.ok(count);
+    }
+
 }

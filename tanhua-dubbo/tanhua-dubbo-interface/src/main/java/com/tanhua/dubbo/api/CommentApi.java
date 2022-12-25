@@ -8,4 +8,8 @@ public interface CommentApi {
     Integer save(Comment newComment, int type);
 
     List<Comment> getCommentListByMovementId(Integer page, Integer pagesize, String movementId);
+
+    Boolean check(String movementApi, int type, Long userId);
+
+    Integer delete(Comment comment, int type);
 }

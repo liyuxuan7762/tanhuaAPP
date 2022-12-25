@@ -5,7 +5,7 @@ package com.tanhua.model.enums;
  */
 public enum CommentType {
 
-    LIKE(1), COMMENT(2), LOVE(3);
+    LIKE(1), COMMENT(2), LOVE(3), LIKECOMMENT(4);
 
     int type;
 

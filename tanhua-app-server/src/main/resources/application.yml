@@ -16,6 +16,8 @@ dubbo:    #dubbo配置
     address: spring-cloud://localhost
   consumer:
     check: false
+    timeout: 300000
+    retries: 0
   cloud:
     subscribed-services: tanhua-dubbo-db,tanhua-dubbo-mongo
 tanhua:

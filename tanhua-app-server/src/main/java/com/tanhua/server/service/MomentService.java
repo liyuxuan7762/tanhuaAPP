@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.tanhua.common.utils.Constants.*;
+
 @Service
 public class MomentService {
     @Resource
@@ -108,6 +110,16 @@ public class MomentService {
                 if (userInfo != null) {
                     MovementsVo init = MovementsVo.init(userInfo, movement);
                     // 使用EmptyList 包报错 https://blog.csdn.net/fengbin111/article/details/105909654/
+                    // 从Redis中获取数据，判断用户书否喜欢过或者点赞过这条动态
+                    String key = MOVEMENTS_INTERACT_KEY + movement.getId().toHexString();
+                    String loveHashKey= MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();
+                    String likeHashKey= MOVEMENT_LIKE_HASHKEY + UserHolder.getUserId();
+                    if (this.redisTemplate.opsForHash().hasKey(key, loveHashKey)) {
+                        init.setHasLoved(1);
+                    }
+                    if (this.redisTemplate.opsForHash().hasKey(key, likeHashKey)) {
+                        init.setHasLiked(1);
+                    }
                     voList.add(init);
                 }
             }
