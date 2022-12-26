@@ -7,8 +7,10 @@ import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.mongo.Movement;
+import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
+import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -39,6 +41,9 @@ public class MomentService {
 
 
     public void publish(Movement movement, MultipartFile[] files) throws IOException {
+        if (StringUtils.isEmpty(movement.getTextContent())) {
+            throw new BusinessException(ErrorResult.contentError());
+        }
         // 1. 获取用户id 设置到moment中
         Long userId = UserHolder.getUserId();
         movement.setUserId(userId);
@@ -112,8 +117,8 @@ public class MomentService {
                     // 使用EmptyList 包报错 https://blog.csdn.net/fengbin111/article/details/105909654/
                     // 从Redis中获取数据，判断用户书否喜欢过或者点赞过这条动态
                     String key = MOVEMENTS_INTERACT_KEY + movement.getId().toHexString();
-                    String loveHashKey= MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();
-                    String likeHashKey= MOVEMENT_LIKE_HASHKEY + UserHolder.getUserId();
+                    String loveHashKey = MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();
+                    String likeHashKey = MOVEMENT_LIKE_HASHKEY + UserHolder.getUserId();
                     if (this.redisTemplate.opsForHash().hasKey(key, loveHashKey)) {
                         init.setHasLoved(1);
                     }
@@ -152,7 +157,7 @@ public class MomentService {
 
                 // 根据pids查询出所有的movement
                 movementList = this.movementApi.getMovementByPids(pids);
-            };
+            }
         }
         // 4. 封装vo
         List<MovementsVo> movementsVoList = createMovementVo(movementList);

@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Async;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @DubboService
@@ -60,6 +61,7 @@ public class MovementApiImpl implements MovementApi {
     @Override
     public void saveTimeLine(Movement movement, long createTime) {
         List<Friend> friendList = this.getFriendListByUserId(movement.getUserId());
+        List<MovementTimeLine> timeLineList = new ArrayList<>();
         MovementTimeLine timeLine = null;
         if (!friendList.isEmpty()) {
             for (Friend friend : friendList) {
@@ -70,8 +72,9 @@ public class MovementApiImpl implements MovementApi {
                 timeLine.setMovementId(movement.getId());
                 timeLine.setFriendId(friend.getFriendId());
                 // 将记录保存TimeLine表
-                this.mongoTemplate.save(timeLine);
+                timeLineList.add(timeLine);
             }
+            this.mongoTemplate.insert(timeLineList, MovementTimeLine.class);
         }
     }
 
