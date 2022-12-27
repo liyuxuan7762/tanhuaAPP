@@ -1,6 +1,8 @@
 package com.tanhua.server.service;
 
 import com.tanhua.autoconfig.template.EmailTemplate;
+import com.tanhua.autoconfig.template.HuanXinTemplate;
+import com.tanhua.common.utils.Constants;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
@@ -28,6 +30,9 @@ public class UserService {
     private RedisTemplate<String, String> redisTemplate;
     @DubboReference
     private UserApi userApi;
+
+    @Resource
+    private HuanXinTemplate huanXinTemplate;
 
     public void sendMsg(String phone) {
         // 1. 生成验证码
@@ -59,6 +64,19 @@ public class UserService {
             Long id = this.userApi.save(user);
             user.setId(id);
             isNew = true;
+
+            // 将用户注册到环信
+            // 1. 生成环信的用户名和密码
+            String hxUser = Constants.HX_USER_PREFIX + user.getId();
+            // 2. 保存到环信
+            Boolean flag = this.huanXinTemplate.createUser(hxUser, Constants.INIT_PASSWORD);
+            // 3. 如果保存成功，则将用户名密码保存到数据库中
+            if(flag) {
+                user.setHxUser(hxUser);
+                user.setHxPassword(Constants.INIT_PASSWORD);
+                this.userApi.updateHx(user);
+            }
+
         }
         // 5.生成Token 保存id和phone
         Map tokenMap = new HashMap();

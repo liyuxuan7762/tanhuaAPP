@@ -1,20 +1,29 @@
 package com.tanhua.server.service;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.fastjson.JSON;
+import com.tanhua.autoconfig.template.HuanXinTemplate;
+import com.tanhua.dubbo.api.QuestionApi;
 import com.tanhua.dubbo.api.RecommendUserApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.mongo.RecommendUser;
+import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.RecommendUserDto;
 import com.tanhua.model.vo.TodayBest;
+import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.tanhua.common.utils.Constants.HX_USER_PREFIX;
 
 @Service
 public class TanhuaService {
@@ -23,6 +32,13 @@ public class TanhuaService {
     private RecommendUserApi recommendUserApi;
     @DubboReference
     private UserInfoApi userInfoApi;
+
+    @DubboReference
+    private QuestionApi questionApi;
+
+    @Resource
+    private HuanXinTemplate huanXinTemplate;
+
 
     public TodayBest getTodayBest() {
         // 1. 获取当前用户
@@ -100,5 +116,51 @@ public class TanhuaService {
             result.setItems(todayBestList);
         }
         return result;
+    }
+
+    /**
+     * 查询佳人详情
+     *
+     * @param userId 用户id
+     * @return
+     */
+    public TodayBest getTodayBestById(Long userId) {
+        // 1. 查询UserInfo表
+        UserInfo userInfo = this.userInfoApi.getUserInfoById(userId);
+        // 2. 查询RecommendUser表
+        RecommendUser user = this.recommendUserApi.getRecommendUserByUserId(userId);
+        // 3. 构建VO
+        return TodayBest.init(userInfo, user);
+    }
+
+    public String getQuestionByUserId(Long userId) {
+        return this.questionApi.getQuestionByUserId(userId);
+    }
+
+    /**
+     * 回复陌生人问题
+     *
+     * @param userId 收件人用户id
+     * @param reply  回复内容
+     */
+    public void replyQuestion(Long userId, String reply) {
+        // 1. 发送信息包含 当前用户id 当前用户环信id，昵称，问题和回答
+        Long currentUserId = UserHolder.getUserId();
+        String currentHxId = HX_USER_PREFIX + currentUserId;
+        String nickName = this.userInfoApi.getUserInfoById(currentUserId).getNickname();
+        String question = this.questionApi.getQuestionByUserId(userId);
+
+        Map map = new HashMap();
+        map.put("userId", currentUserId);
+        map.put("huanXinId", currentHxId);
+        map.put("nickname", nickName);
+        map.put("strangerQuestion", question);
+        map.put("reply", reply);
+        String msg = JSON.toJSONString(map);
+        // 2. 调用template发送消息
+        Boolean flag = this.huanXinTemplate.sendMsg(HX_USER_PREFIX + userId, msg);
+        if (!flag) {
+            throw new BusinessException(ErrorResult.error());
+        }
     }
 }

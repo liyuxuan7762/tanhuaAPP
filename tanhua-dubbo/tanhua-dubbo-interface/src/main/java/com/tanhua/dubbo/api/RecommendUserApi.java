@@ -7,4 +7,6 @@ public interface RecommendUserApi {
     RecommendUser getTodayBest(Long userId);
 
     PageResult getRecommendationList(Integer page, Integer pagesize, Long userId);
+
+    RecommendUser getRecommendUserByUserId(Long userId);
 }

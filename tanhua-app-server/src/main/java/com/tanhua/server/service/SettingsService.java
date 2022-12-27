@@ -34,8 +34,7 @@ public class SettingsService {
         // 2. 获取到用户的手机号
         settingsVo.setPhone(UserHolder.getUserPhone());
         // 3. 根据用户id查询陌生人问题
-        Question question = this.questionApi.getQuestionByUserId(UserHolder.getUserId());
-        String txt = question == null ? "用户没有设置陌生人问题" : question.getTxt();
+        String txt = this.questionApi.getQuestionByUserId(UserHolder.getUserId());
         settingsVo.setStrangerQuestion(txt);
         // 4. 查询设置开关状态
         Settings settings = this.settingsApi.getSettingsByUserId(UserHolder.getUserId());
@@ -51,14 +50,17 @@ public class SettingsService {
         // 1. 获取用户ID
         Long userId = UserHolder.getUserId();
         // 2. 判断用户是否设置过问题 如果设置过 则为更新 否则为新增
-        Question question = this.questionApi.getQuestionByUserId(userId);
-        if (question == null) {
+        String txt = this.questionApi.getQuestionByUserId(userId);
+        Question question = null;
+        if (txt == null) {
             // 新增问题
+            question = new Question();
             question.setUserId(userId);
             question.setTxt(content);
             this.questionApi.save(question);
         } else {
             // 更新问题
+            question = new Question();
             question.setTxt(content);
             this.questionApi.update(question);
         }

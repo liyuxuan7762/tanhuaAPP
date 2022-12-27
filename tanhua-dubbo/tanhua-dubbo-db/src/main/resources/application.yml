@@ -26,3 +26,5 @@ mybatis-plus:
     db-config:
       table-prefix: tb_   # 表名前缀
       id-type: auto   # id策略为自增长
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -51,6 +51,11 @@ public class UserInfoApiImpl implements UserInfoApi {
             if (StringUtils.isNotEmpty(condition.getEducation())) {
                 queryWrapper.eq("education", condition.getEducation());
             }
+            // 昵称
+            if (StringUtils.isNotEmpty(condition.getNickname())) {
+                queryWrapper.like("nickname", condition.getNickname());
+            }
+
         }
         // 3. 查询
         List<UserInfo> list = this.userInfoMapper.selectList(queryWrapper);

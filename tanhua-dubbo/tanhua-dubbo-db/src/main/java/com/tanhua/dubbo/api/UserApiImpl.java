@@ -8,7 +8,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @DubboService
-public class    UserApiImpl  implements UserApi{
+public class UserApiImpl implements UserApi {
 
     @Autowired
     private UserMapper userMapper;
@@ -17,7 +17,7 @@ public class    UserApiImpl  implements UserApi{
     @Override
     public User findByMobile(String mobile) {
         QueryWrapper<User> qw = new QueryWrapper<>();
-        qw.eq("mobile",mobile);
+        qw.eq("mobile", mobile);
         return userMapper.selectOne(qw);
     }
 
@@ -34,4 +34,15 @@ public class    UserApiImpl  implements UserApi{
         user.setMobile(phone);
         this.userMapper.updateById(user);
     }
+
+    @Override
+    public void updateHx(User user) {
+        this.userMapper.updateById(user);
+    }
+
+    @Override
+    public User getHuanXinUser(Long userId) {
+        return this.userMapper.selectById(userId);
+    }
+
 }

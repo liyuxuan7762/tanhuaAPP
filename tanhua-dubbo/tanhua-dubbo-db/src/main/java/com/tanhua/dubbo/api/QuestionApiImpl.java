@@ -13,10 +13,11 @@ public class QuestionApiImpl implements QuestionApi {
     private QuestionMapper questionMapper;
 
     @Override
-    public Question getQuestionByUserId(Long userId) {
+    public String getQuestionByUserId(Long userId) {
         LambdaQueryWrapper<Question> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Question::getUserId, userId);
-        return this.questionMapper.selectOne(queryWrapper);
+        Question question = this.questionMapper.selectOne(queryWrapper);
+        return question == null ? "我爱Java" : question.getTxt();
     }
 
     @Override

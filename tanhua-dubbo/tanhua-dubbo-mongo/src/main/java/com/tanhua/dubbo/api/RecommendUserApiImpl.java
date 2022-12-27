@@ -36,4 +36,11 @@ public class RecommendUserApiImpl implements RecommendUserApi {
         // 3，构造结果
         return new PageResult(page, pagesize, (int) count, recommendUsers);
     }
+
+    @Override
+    public RecommendUser getRecommendUserByUserId(Long userId) {
+        Criteria criteria = Criteria.where("userId").is(userId);
+        Query query = new Query(criteria);
+        return this.mongoTemplate.findOne(query, RecommendUser.class);
+    }
 }

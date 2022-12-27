@@ -9,4 +9,8 @@ public interface UserApi {
     Long save(User user);
 
     void updatePhone(String phone, Long userId);
+
+    void updateHx(User user);
+
+    User getHuanXinUser(Long userId);
 }

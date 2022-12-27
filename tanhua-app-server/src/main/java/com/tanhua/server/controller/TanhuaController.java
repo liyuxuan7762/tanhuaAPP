@@ -5,11 +5,10 @@ import com.tanhua.model.vo.RecommendUserDto;
 import com.tanhua.model.vo.TodayBest;
 import com.tanhua.server.service.TanhuaService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tanhua")
@@ -33,6 +32,7 @@ public class TanhuaController {
 
     /**
      * 获取推荐列表
+     *
      * @return 推荐列表分页对象
      */
     @GetMapping("/recommendation")
@@ -45,5 +45,39 @@ public class TanhuaController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * 查询佳人详情
+     *
+     * @param userId 用户id
+     * @return
+     */
+    @GetMapping("/{id}/personalInfo")
+    public ResponseEntity getTodayBestById(@PathVariable(name = "id") Long userId) {
+        TodayBest todayBest = this.tanhuaService.getTodayBestById(userId);
+        return ResponseEntity.ok(todayBest);
+    }
 
+    /**
+     * 获取陌生人问题
+     * @param userId 用户id
+     * @return
+     */
+    @GetMapping("/strangerQuestions")
+    public ResponseEntity strangerQuestions(Long userId) {
+        String question = this.tanhuaService.getQuestionByUserId(userId);
+        return ResponseEntity.ok(question);
+    }
+
+    /**
+     * 回复陌生人问题
+     * @param map
+     * @return
+     */
+    @PostMapping("/strangerQuestions")
+    public ResponseEntity replyQuestion(@RequestBody Map map) {
+        Long userId = Long.parseLong(map.get("userId").toString());
+        String reply = map.get("reply").toString();
+        this.tanhuaService.replyQuestion(userId, reply);
+        return ResponseEntity.ok(null);
+    }
 }
