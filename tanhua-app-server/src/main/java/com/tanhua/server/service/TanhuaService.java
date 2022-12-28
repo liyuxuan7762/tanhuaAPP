@@ -7,6 +7,7 @@ import com.tanhua.common.utils.Constants;
 import com.tanhua.dubbo.api.*;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.mongo.RecommendUser;
+import com.tanhua.model.mongo.Visitors;
 import com.tanhua.model.vo.*;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.tanhua.common.utils.Constants.HX_USER_PREFIX;
@@ -44,6 +46,9 @@ public class TanhuaService {
 
     @DubboReference
     private UserLocationApi userLocationApi;
+
+    @DubboReference
+    private VisitorApi visitorApi;
 
 
     public TodayBest getTodayBest() {
@@ -135,6 +140,17 @@ public class TanhuaService {
         UserInfo userInfo = this.userInfoApi.getUserInfoById(userId);
         // 2. 查询RecommendUser表
         RecommendUser user = this.recommendUserApi.getRecommendUserByUserId(userId);
+
+        // 记录访问记录
+        Visitors visitors = new Visitors();
+        visitors.setDate(System.currentTimeMillis());
+        visitors.setVisitorUserId(UserHolder.getUserId());
+        visitors.setUserId(userId);
+        visitors.setVisitDate(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+        visitors.setScore(user.getScore());
+        visitors.setFrom("圈子");
+
+        this.visitorApi.save(visitors);
         // 3. 构建VO
         return TodayBest.init(userInfo, user);
     }

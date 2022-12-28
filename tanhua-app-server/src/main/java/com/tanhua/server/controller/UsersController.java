@@ -2,7 +2,7 @@ package com.tanhua.server.controller;
 
 
 import com.tanhua.model.domain.UserInfo;
-import com.tanhua.model.mongo.UserLike;
+import com.tanhua.model.vo.LoveCount;
 import com.tanhua.model.vo.UserInfoVo;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.UserInfoService;
@@ -67,8 +67,13 @@ public class UsersController {
         return ResponseEntity.ok(null);
     }
 
+    /**
+     * 计算互相喜欢 喜欢 和粉丝数
+     * @return
+     */
     @GetMapping("/counts")
     public ResponseEntity getCount() {
-        this.
+        LoveCount count = this.userInfoService.getCount();
+        return ResponseEntity.ok(count);
     }
 }

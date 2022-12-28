@@ -61,7 +61,7 @@ public class UserLocationApiImpl implements UserLocationApi {
         }
         // 2. 查询附近的人
         GeoJsonPoint point = userLocation.getLocation(); // 圆心
-        Distance dis = new Distance(distance / 1000, Metrics.KILOMETERS); // 半径
+        Distance dis = new Distance(Integer.parseInt(distance) / 1000, Metrics.KILOMETERS); // 半径
         Circle circle = new Circle(point, dis);
         Query nearQuery = new Query(Criteria.where("location").withinSphere(circle));
         List<UserLocation> userLocations = this.mongoTemplate.find(query, UserLocation.class);

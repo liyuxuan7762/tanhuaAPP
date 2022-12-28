@@ -5,11 +5,14 @@ import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.common.utils.Constants;
 import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.dubbo.api.VisitorApi;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.mongo.Movement;
+import com.tanhua.model.mongo.Visitors;
 import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
+import com.tanhua.model.vo.VisitorsVo;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +41,9 @@ public class MomentService {
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+
+    @DubboReference
+    private VisitorApi visitorApi;
 
 
     public void publish(Movement movement, MultipartFile[] files) throws IOException {
@@ -173,6 +179,34 @@ public class MomentService {
         UserInfo userInfo = this.userInfoApi.getUserInfoById(userId);
         // 3. 封装Vo对象
         return MovementsVo.init(userInfo, movement);
+    }
+
+    /**
+     * 查询谁看过我
+     *
+     * @return
+     */
+    public List<VisitorsVo> visitors() {
+        // 1. 从Redis中获取数据 查看最后一次查看完整访客列表的时间
+        // Redis中的key VISITORS 哈希key 用户id value为最后一次查看的时间戳
+        String lastTime = (String) this.redisTemplate.opsForHash().get(VISITORS, UserHolder.getUserId().toString());
+        Long time = lastTime != null ? Long.valueOf(lastTime) : null;
+        // 2. 查询访客表
+        List<Visitors> visitorsList = this.visitorApi.getVisitors(UserHolder.getUserId(), time);
+        List<Long> ids = CollUtil.getFieldValues(visitorsList, "visitorUserId", Long.class);
+        // 3. 查询访客的用户详情
+        Map<Long, UserInfo> map = this.userInfoApi.getUserInfoByIds(ids, null);
+        // 4. 封装数据
+        List<VisitorsVo> voList = new ArrayList<>();
+        for (Visitors visitors : visitorsList) {
+            Long visitorUserId = visitors.getVisitorUserId();
+            UserInfo userInfo = map.get(visitorUserId);
+            if (userInfo != null) {
+                voList.add(VisitorsVo.init(userInfo, visitors));
+            }
+        }
+
+        return voList;
     }
 }
 

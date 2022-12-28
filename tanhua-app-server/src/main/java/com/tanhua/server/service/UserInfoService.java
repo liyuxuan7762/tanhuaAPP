@@ -3,8 +3,11 @@ package com.tanhua.server.service;
 import com.tanhua.autoconfig.template.AipFaceTemplate;
 import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.dubbo.api.UserLikeApi;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.mongo.UserLike;
 import com.tanhua.model.vo.ErrorResult;
+import com.tanhua.model.vo.LoveCount;
 import com.tanhua.model.vo.UserInfoVo;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
@@ -15,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserInfoService {
@@ -27,6 +32,9 @@ public class UserInfoService {
 
     @Resource
     private AipFaceTemplate aipFaceTemplate;
+
+    @DubboReference
+    private UserLikeApi userLikeApi;
 
     public void save(UserInfo userInfo) {
         this.userInfoApi.save(userInfo);
@@ -88,5 +96,25 @@ public class UserInfoService {
             throw new BusinessException(ErrorResult.faceError());
         }
         return imageUrl;
+    }
+
+    public LoveCount getCount() {
+        int eachLoveCount = 0;
+        // 1. 查询UserLike表，条件是userId = 当前登录用户
+        List<UserLike> userLikeList = this.userLikeApi.getUserLikeByUserId(UserHolder.getUserId());
+        // 2. 查询UserLike表，条件是likeUserId = 当前用户
+        Map<Long, UserLike> map = this.userLikeApi.getUserLikeByUserLikeId(UserHolder.getUserId());
+        // 3. 遍历userLikeList
+        for (UserLike userLike : userLikeList) {
+            Long likeUserId = userLike.getLikeUserId();
+            if (map.containsKey(likeUserId)) {
+                eachLoveCount++;
+            }
+        }
+        LoveCount count = new LoveCount();
+        count.setEachLoveCount(eachLoveCount);
+        count.setLoveCount(userLikeList.size());
+        count.setFanCount(map.size() - eachLoveCount);
+        return count;
     }
 }

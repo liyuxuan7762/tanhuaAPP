@@ -3,6 +3,7 @@ package com.tanhua.server.controller;
 import com.tanhua.model.mongo.Movement;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
+import com.tanhua.model.vo.VisitorsVo;
 import com.tanhua.server.service.CommentService;
 import com.tanhua.server.service.MomentService;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/movements")
@@ -23,7 +25,8 @@ public class MomentController {
 
     /**
      * 发送动态
-     * @param movement 动态对象
+     *
+     * @param movement     动态对象
      * @param imageContent 图片列表
      * @return
      * @throws IOException
@@ -34,13 +37,14 @@ public class MomentController {
         // 1. 调用service方法保存动态
         this.momentService.publish(movement, imageContent);
         // 2. 返回结果
-        return  ResponseEntity.ok(null);
+        return ResponseEntity.ok(null);
     }
 
     /**
      * 查询个人动态
-     * @param userId 登录用户ID
-     * @param page 页码
+     *
+     * @param userId   登录用户ID
+     * @param page     页码
      * @param pagesize 页大小
      * @return
      */
@@ -55,32 +59,35 @@ public class MomentController {
 
     /**
      * 查看好友动态
-     * @param page 页号
+     *
+     * @param page     页号
      * @param pagesize 页大小
      * @return
      */
     @GetMapping
     public ResponseEntity getFriendMovement(@RequestParam(defaultValue = "1") Integer page,
                                             @RequestParam(defaultValue = "5") Integer pagesize) {
-        PageResult result = this.momentService.getFriendMovement(page,pagesize);
+        PageResult result = this.momentService.getFriendMovement(page, pagesize);
         return ResponseEntity.ok(result);
     }
 
     /**
      * 获取推荐的动态
-     * @param page 页号
+     *
+     * @param page     页号
      * @param pagesize 页大小
      * @return
      */
     @GetMapping("/recommend")
     public ResponseEntity getRecommendMovement(@RequestParam(defaultValue = "1") Integer page,
                                                @RequestParam(defaultValue = "5") Integer pagesize) {
-        PageResult result = this.momentService.getRecommendMovement(page,pagesize);
+        PageResult result = this.momentService.getRecommendMovement(page, pagesize);
         return ResponseEntity.ok(result);
     }
 
     /**
      * 查询动态的详情
+     *
      * @param id
      * @return
      */
@@ -98,6 +105,7 @@ public class MomentController {
 
     /**
      * 用户点赞
+     *
      * @param movementId 动态Id
      * @return 点赞之后最新的点赞数量
      */
@@ -111,6 +119,7 @@ public class MomentController {
 
     /**
      * 取消点赞
+     *
      * @param movementId 动态Id
      * @return 取消点赞之后最新的点赞数量
      */
@@ -124,6 +133,7 @@ public class MomentController {
 
     /**
      * 用户喜欢动态
+     *
      * @param movementId 动态Id
      * @return
      */
@@ -136,6 +146,7 @@ public class MomentController {
 
     /**
      * 用户取消喜欢动态
+     *
      * @param movementId 动态Id
      * @return
      */
@@ -146,5 +157,14 @@ public class MomentController {
         return ResponseEntity.ok(count);
     }
 
-
+    /**
+     * 查询谁看过我
+     *
+     * @return
+     */
+    @GetMapping("/visitors")
+    public ResponseEntity visitors() {
+        List<VisitorsVo> voList = this.momentService.visitors();
+        return ResponseEntity.ok(voList);
+    }
 }

@@ -1,6 +1,7 @@
 package com.tanhua.dubbo.api;
 
 
+import cn.hutool.core.collection.CollUtil;
 import com.tanhua.model.mongo.UserLike;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -9,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 @DubboService
 public class UserLikeApiImpl implements UserLikeApi {
@@ -43,5 +46,18 @@ public class UserLikeApiImpl implements UserLikeApi {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public List<UserLike> getUserLikeByUserId(Long userId) {
+        Query query = new Query(Criteria.where("userId").is(userId));
+        return this.mongoTemplate.find(query, UserLike.class);
+    }
+
+    @Override
+    public Map<Long, UserLike> getUserLikeByUserLikeId(Long userId) {
+        Query query = new Query(Criteria.where("likeUserId").is(userId));
+        List<UserLike> userLikeList = this.mongoTemplate.find(query, UserLike.class);
+        return CollUtil.fieldValueMap(userLikeList, "userId");
     }
 }
