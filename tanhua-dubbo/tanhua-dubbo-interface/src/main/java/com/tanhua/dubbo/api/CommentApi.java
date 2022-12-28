@@ -12,4 +12,6 @@ public interface CommentApi {
     Boolean check(String movementApi, int type, Long userId);
 
     Integer delete(Comment comment, int type);
+
+    List<Comment> getCommentByType(Long userId, Integer page, Integer pagesize, int type);
 }

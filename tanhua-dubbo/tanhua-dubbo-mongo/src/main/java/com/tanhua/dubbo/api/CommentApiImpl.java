@@ -169,4 +169,12 @@ public class CommentApiImpl implements CommentApi {
         }
     }
 
+    @Override
+    public List<Comment> getCommentByType(Long userId, Integer page, Integer pagesize, int type) {
+        Criteria criteria = Criteria.where("commentType").is(type).and("publishUserId").is(userId);
+        Query query = new Query(criteria);
+        query.skip((page - 1) * pagesize).limit(pagesize);
+        return this.mongoTemplate.find(query, Comment.class);
+    }
+
 }

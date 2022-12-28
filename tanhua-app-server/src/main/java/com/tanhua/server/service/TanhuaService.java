@@ -3,25 +3,19 @@ package com.tanhua.server.service;
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
-import com.tanhua.dubbo.api.QuestionApi;
-import com.tanhua.dubbo.api.RecommendUserApi;
-import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.common.utils.Constants;
+import com.tanhua.dubbo.api.*;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.mongo.RecommendUser;
-import com.tanhua.model.vo.ErrorResult;
-import com.tanhua.model.vo.PageResult;
-import com.tanhua.model.vo.RecommendUserDto;
-import com.tanhua.model.vo.TodayBest;
+import com.tanhua.model.vo.*;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.tanhua.common.utils.Constants.HX_USER_PREFIX;
 
@@ -36,8 +30,20 @@ public class TanhuaService {
     @DubboReference
     private QuestionApi questionApi;
 
+    @DubboReference
+    private UserLikeApi userLikeApi;
+
     @Resource
     private HuanXinTemplate huanXinTemplate;
+
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
+
+    @Resource
+    private MessageService messageService;
+
+    @DubboReference
+    private UserLocationApi userLocationApi;
 
 
     public TodayBest getTodayBest() {
@@ -162,5 +168,96 @@ public class TanhuaService {
         if (!flag) {
             throw new BusinessException(ErrorResult.error());
         }
+    }
+
+
+    /**
+     * 获取左滑右滑数据
+     *
+     * @return
+     */
+    public List<TodayBest> getCards() {
+        Long userId = UserHolder.getUserId();
+        // 1. 调用API 查询到所有符合要求的RecommendUser集合
+        List<RecommendUser> recommendUserList = this.recommendUserApi.getCards(userId, 10);
+        // 2. 根据集合，查询出所有的用户详情
+        List<Long> ids = CollUtil.getFieldValues(recommendUserList, "userId", Long.class);
+        Map<Long, UserInfo> map = this.userInfoApi.getUserInfoByIds(ids, null);
+        // 3. 封装VO
+        List<TodayBest> list = new ArrayList<>();
+        for (RecommendUser recommendUser : recommendUserList) {
+            Long id = recommendUser.getUserId();
+            UserInfo userInfo = map.get(id);
+            if (userInfo != null) {
+                list.add(TodayBest.init(userInfo, recommendUser));
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * 左滑喜欢
+     *
+     * @param likeUserId
+     */
+    public void loveUser(Long likeUserId) {
+        // 1. 将用户喜欢的信息保存到UserLike表
+        boolean flag = this.userLikeApi.save(UserHolder.getUserId(), likeUserId, true);
+        if (!flag) {
+            throw new BusinessException(ErrorResult.error());
+        }
+        // 2. 将用户喜欢信息保存到Redis
+        this.redisTemplate.opsForSet().add(Constants.USER_LIKE_KEY + UserHolder.getUserId(), likeUserId.toString());
+        this.redisTemplate.opsForSet().remove(Constants.USER_NOT_LIKE_KEY + UserHolder.getUserId(), likeUserId.toString());
+        // 3. 判断是否为双向喜欢
+        boolean like = isLike(likeUserId, UserHolder.getUserId());
+        if (like) {
+            // 双向喜欢 添加好友
+            this.messageService.contacts(likeUserId);
+        }
+    }
+
+    /**
+     * 判断userId是否喜欢likeUserId
+     *
+     * @param userId
+     * @param likeUserId
+     * @return
+     */
+    private boolean isLike(Long userId, Long likeUserId) {
+        return this.redisTemplate.opsForSet().isMember(Constants.USER_LIKE_KEY + userId, likeUserId);
+    }
+
+    public void unloveUser(Long likeUserId) {
+        // 1. 将用户喜欢的信息保存到UserLike表
+        boolean flag = this.userLikeApi.save(UserHolder.getUserId(), likeUserId, false);
+        if (!flag) {
+            throw new BusinessException(ErrorResult.error());
+        }
+        // 2. 将用户喜欢信息保存到Redis
+        this.redisTemplate.opsForSet().remove(Constants.USER_LIKE_KEY + UserHolder.getUserId(), likeUserId.toString());
+        this.redisTemplate.opsForSet().add(Constants.USER_NOT_LIKE_KEY + UserHolder.getUserId(), likeUserId.toString());
+    }
+
+    public List<NearUserVo> getNearPeople(String gender, String distance) {
+        // 1. 获取到附近人的用户id
+        Long userId = UserHolder.getUserId();
+        List<Long> ids = this.userLocationApi.getNearPeople(userId, gender, distance);
+        // 2. 根据用户id查询用户详情
+        Map<Long, UserInfo> map = this.userInfoApi.getUserInfoByIds(ids, null);
+        // 3. 封装VO 注意排除当前用户
+        List<NearUserVo> voList = new ArrayList<>();
+        for (Long id : ids) {
+            if (Objects.equals(id, userId)) {
+                // 用户自己
+                continue;
+            }
+            UserInfo userInfo = map.get(id);
+            if (userInfo != null) {
+                voList.add(NearUserVo.init(userInfo));
+            }
+        }
+        return voList;
     }
 }

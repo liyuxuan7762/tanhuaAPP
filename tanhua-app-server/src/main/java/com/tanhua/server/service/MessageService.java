@@ -3,10 +3,16 @@ package com.tanhua.server.service;
 import cn.hutool.core.collection.CollUtil;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.common.utils.Constants;
+import com.tanhua.dubbo.api.AnnouncementApi;
+import com.tanhua.dubbo.api.CommentApi;
 import com.tanhua.dubbo.api.FriendApi;
 import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.model.domain.Announcement;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.enums.CommentType;
+import com.tanhua.model.mongo.Comment;
 import com.tanhua.model.mongo.Friend;
+import com.tanhua.model.vo.CommentVo;
 import com.tanhua.model.vo.ContactVo;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.UserInfoVo;
@@ -28,6 +34,12 @@ public class MessageService {
 
     @DubboReference
     private FriendApi friendApi;
+
+    @DubboReference
+    private AnnouncementApi announcementApi;
+
+    @DubboReference
+    private CommentApi commentApi;
 
     @Resource
     private HuanXinTemplate huanXinTemplate;
@@ -72,5 +84,37 @@ public class MessageService {
         }
         // 5. 封装实现类
         return new PageResult(page, pagesize, 0, voList);
+    }
+
+    public PageResult getAnnouncements(Integer page, Integer pagesize) {
+        List<Announcement> announcements = this.announcementApi.getAnnouncements(page, pagesize);
+        return new PageResult(page, pagesize, 0, announcements);
+    }
+
+    public PageResult getLoves(Integer page, Integer pagesize) {
+        return getCommentByType(UserHolder.getUserId(), page, pagesize, CommentType.LOVE.getType());
+    }
+
+    public PageResult getLikes(Integer page, Integer pagesize) {
+        return getCommentByType(UserHolder.getUserId(), page, pagesize, CommentType.LIKE.getType());
+    }
+
+    public PageResult getComments(Integer page, Integer pagesize) {
+        return getCommentByType(UserHolder.getUserId(), page, pagesize, CommentType.COMMENT.getType());
+    }
+
+    private PageResult getCommentByType(Long userId, Integer page, Integer pagesize, int type) {
+        List<Comment> commentList = this.commentApi.getCommentByType(userId, page, pagesize, type);
+        List<Long> ids = CollUtil.getFieldValues(commentList, "userId", Long.class);
+        Map<Long, UserInfo> map = this.userInfoApi.getUserInfoByIds(ids, null);
+        List<CommentVo> voList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            Long id = comment.getUserId();
+            UserInfo userInfo = map.get(id);
+            if (userInfo != null) {
+                voList.add(CommentVo.init(userInfo, comment));
+            }
+        }
+        return new PageResult(page,pagesize, 0, voList);
     }
 }

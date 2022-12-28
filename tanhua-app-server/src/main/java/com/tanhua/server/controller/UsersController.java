@@ -2,6 +2,7 @@ package com.tanhua.server.controller;
 
 
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.mongo.UserLike;
 import com.tanhua.model.vo.UserInfoVo;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.UserInfoService;
@@ -64,5 +65,10 @@ public class UsersController {
     public ResponseEntity updateHeader(MultipartFile headPhoto) {
         this.userInfoService.updateHeader(headPhoto);
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/counts")
+    public ResponseEntity getCount() {
+        this.
     }
 }
