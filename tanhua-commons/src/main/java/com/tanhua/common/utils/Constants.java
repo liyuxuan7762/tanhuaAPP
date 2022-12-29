@@ -45,4 +45,6 @@ public class Constants {
     public static final String USER_LIKE_KEY = "USER__LIKE_KEY";
 
     public static final String USER_NOT_LIKE_KEY = "USER_NOT_LIKE_KEY";
+
+    public static final String CAP_CODE = "CAP_CODE_";
 }

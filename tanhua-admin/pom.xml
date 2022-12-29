@@ -132,6 +132,7 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatis.mybatis-plus}</version>
         </dependency>
+
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

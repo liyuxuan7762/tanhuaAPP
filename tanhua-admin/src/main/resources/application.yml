@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/tanhua-admin?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/tanhua-admin
     username: root
-    password: root
+    password: 1234
   rabbitmq:
     host: 192.168.136.160
     port: 5672
