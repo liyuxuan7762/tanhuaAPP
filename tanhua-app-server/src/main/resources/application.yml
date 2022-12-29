@@ -56,3 +56,8 @@ fdfs:
   #TrackerList参数,支持多个
   tracker-list: 192.168.136.160:22122
   web-server-url: http://192.168.136.160:8888/
+Spring:
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
