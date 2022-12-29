@@ -28,7 +28,7 @@ public class Constants {
     public static final String VISITORS = "VISITORS";
 
     //关注用户
-    public static final String FOCUS_USER = "FOCUS_USER_{}_{}";
+    public static final String FOCUS_USER = "FOCUS_USER_";
 
 	//初始化密码
     public static final String INIT_PASSWORD = "123456";
