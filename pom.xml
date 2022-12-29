@@ -14,6 +14,7 @@
         <module>tanhua-dubbo</module>
         <module>tanhua-commons</module>
         <module>tanhua-app-server</module>
+        <module>tanhua-gateway</module>
     </modules>
 
     <parent>
