@@ -1,5 +1,6 @@
 package com.tanhua.dubbo.api;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.tanhua.model.domain.UserInfo;
 
 import java.util.List;
@@ -23,4 +24,5 @@ public interface UserInfoApi {
 
     Map<Long, UserInfo> getUserInfoByIds(List<Long> ids, UserInfo condition);
 
+    IPage<UserInfo> getUsers(Integer page, Integer pagesize);
 }

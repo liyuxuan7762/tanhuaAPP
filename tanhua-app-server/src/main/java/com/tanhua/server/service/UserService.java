@@ -3,11 +3,13 @@ package com.tanhua.server.service;
 import com.tanhua.autoconfig.template.EmailTemplate;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.common.utils.Constants;
+import com.tanhua.common.utils.LogOperationCodeConstants;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
 import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.server.exception.BusinessException;
+import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -34,7 +36,19 @@ public class UserService {
     @Resource
     private HuanXinTemplate huanXinTemplate;
 
+    @Resource
+    private UserFreezeService userFreezeService;
+
+    @Resource
+    private MqMessageService messageService;
+
     public void sendMsg(String phone) {
+
+        User user = this.userApi.findByMobile(phone);
+        if (user != null) {
+            userFreezeService.checkUser("1", user.getId());
+        }
+
         // 1. 生成验证码
         // String code = RandomStringUtils.randomNumeric(6);
         // 2.调用发送验证码的方法
@@ -56,7 +70,9 @@ public class UserService {
         User user = userApi.findByMobile(phone);
         // 4.如果不存在则新建用户
         boolean isNew = false;
+        String type = LogOperationCodeConstants.LOGIN;
         if (user == null) {
+            type = LogOperationCodeConstants.SIGN_UP;
             // 用户不存在
             user = new User();
             user.setMobile(phone);
@@ -71,13 +87,15 @@ public class UserService {
             // 2. 保存到环信
             Boolean flag = this.huanXinTemplate.createUser(hxUser, Constants.INIT_PASSWORD);
             // 3. 如果保存成功，则将用户名密码保存到数据库中
-            if(flag) {
+            if (flag) {
                 user.setHxUser(hxUser);
                 user.setHxPassword(Constants.INIT_PASSWORD);
                 this.userApi.updateHx(user);
             }
-
         }
+
+        this.messageService.sendLogService(UserHolder.getUserId(), type, LogOperationCodeConstants.MESSAGE_USER_KEY, null);
+
         // 5.生成Token 保存id和phone
         Map tokenMap = new HashMap();
         tokenMap.put("id", user.getId());

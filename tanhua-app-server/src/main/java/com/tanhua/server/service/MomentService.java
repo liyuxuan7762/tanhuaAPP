@@ -45,8 +45,14 @@ public class MomentService {
     @DubboReference
     private VisitorApi visitorApi;
 
+    @Resource
+    private UserFreezeService userFreezeService;
+
 
     public void publish(Movement movement, MultipartFile[] files) throws IOException {
+
+        this.userFreezeService.checkUser("3", UserHolder.getUserId());
+
         if (StringUtils.isEmpty(movement.getTextContent())) {
             throw new BusinessException(ErrorResult.contentError());
         }

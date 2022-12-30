@@ -36,6 +36,9 @@ public class CommentService {
     private UserInfoApi userInfoApi;
 
     @Resource
+    private UserFreezeService userFreezeService;
+
+    @Resource
     private RedisTemplate<String, String> redisTemplate;
 
     /**
@@ -45,6 +48,9 @@ public class CommentService {
      * @param comment    评论正文
      */
     public Integer publishComment(String movementId, String comment) {
+
+        userFreezeService.checkUser("2", UserHolder.getUserId());
+
         // 1. 根据动态ID查询到动态的对象
         Comment newComment = new Comment();
         // 4. 继续封装其他的Comment属性

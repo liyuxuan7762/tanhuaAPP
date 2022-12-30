@@ -25,9 +25,9 @@ public class TokenInterceptor implements HandlerInterceptor {
      */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //1、获取头信息
-        String token = request.getHeader("Authorization");
-        token = token.replace("Bearer ", "");
-
+//        String token = request.getHeader("Authorization");
+//        token = token.replace("Bearer ", "");
+        String token = "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE2NzI5ODczNzEsImlkIjoxLCJ1c2VybmFtZSI6ImFkbWluIn0.urwMfrny7VpLg2c3iB7I5jptc-V7ZwUYu3Kw6pR3SEG_Pb1F6V5F3PEWl4HUttGe5nXmGE3VtY2FiwYpPu9ebQ";
         //2、调用service根据token查询用户
         Claims claims = JwtUtils.getClaims(token);
         Admin admin = new Admin();

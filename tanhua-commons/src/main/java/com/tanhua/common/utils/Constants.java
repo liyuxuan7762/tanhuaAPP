@@ -47,4 +47,9 @@ public class Constants {
     public static final String USER_NOT_LIKE_KEY = "USER_NOT_LIKE_KEY";
 
     public static final String CAP_CODE = "CAP_CODE_";
+
+    public static final String USER_FREEZE = "USER_FREEZE_";
+
+    public static final String LOG_EXCHANGE_NAME = "tanhua.log.exchange";
+    public static final String AUDIT_EXCHANGE_NAME = "tanhua.audit.exchange";
 }

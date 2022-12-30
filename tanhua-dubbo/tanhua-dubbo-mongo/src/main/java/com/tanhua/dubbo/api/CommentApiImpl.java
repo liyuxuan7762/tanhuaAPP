@@ -3,6 +3,7 @@ package com.tanhua.dubbo.api;
 import com.tanhua.model.enums.CommentType;
 import com.tanhua.model.mongo.Comment;
 import com.tanhua.model.mongo.Movement;
+import com.tanhua.model.vo.PageResult;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
@@ -175,6 +176,16 @@ public class CommentApiImpl implements CommentApi {
         Query query = new Query(criteria);
         query.skip((page - 1) * pagesize).limit(pagesize);
         return this.mongoTemplate.find(query, Comment.class);
+    }
+
+    @Override
+    public PageResult getCommentsByMovementId(Integer page, Integer pagesize, Long messageID) {
+        Query query = new Query(Criteria.where("publishId").is(new ObjectId(messageID.toString())));
+        long count = this.mongoTemplate.count(query, Comment.class);
+
+        List<Comment> commentListByMovementId = getCommentListByMovementId(page, pagesize, messageID.toString());
+
+        return new PageResult(page, pagesize, (int) count, commentListByMovementId);
     }
 
 }

@@ -22,4 +22,8 @@ public interface MovementApi {
     List<Movement> getRandomRecommendMovement(Integer pagesize);
 
     Movement getMovementById(String id);
+
+    PageResult getMovementByUserId(Long uid, Integer state, Integer page, Integer pagesize);
+
+
 }

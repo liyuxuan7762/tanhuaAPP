@@ -116,12 +116,13 @@ public class MovementApiImpl implements MovementApi {
     public List<Movement> getRandomRecommendMovement(Integer pagesize) {
         TypedAggregation aggregation = Aggregation.newAggregation(Movement.class,
                 Aggregation.sample(pagesize));
-        AggregationResults<Movement> movements = mongoTemplate.aggregate(aggregation,Movement.class);
+        AggregationResults<Movement> movements = mongoTemplate.aggregate(aggregation, Movement.class);
         return movements.getMappedResults();
     }
 
     /**
      * 根据动态的ID查询动态
+     *
      * @param id
      * @return
      */
@@ -133,6 +134,24 @@ public class MovementApiImpl implements MovementApi {
         // 总之最好是查询的那个条件的数据类型和对应的实体类中类型一致
         return mongoTemplate.findById(id, Movement.class);
     }
+
+    @Override
+    public PageResult getMovementByUserId(Long uid, Integer state, Integer page, Integer pagesize) {
+        Query query = new Query();
+        if (uid != null) {
+            query.addCriteria(Criteria.where("userId").is(uid));
+        }
+        if (state != null) {
+            query.addCriteria(Criteria.where("userId").is(state));
+        }
+        long count = this.mongoTemplate.count(query, Movement.class);
+
+        query.skip((page - 1) * pagesize).limit(pagesize).with(Sort.by(Sort.Order.desc("created")));
+        List<Movement> movementList = this.mongoTemplate.find(query, Movement.class);
+        return new PageResult(page, pagesize, (int) count, movementList);
+    }
+
+
 
 
     @Override

@@ -51,7 +51,7 @@ public class AdminService {
         Map tokenMap = new HashMap();
         tokenMap.put("id", admin.getId());
         tokenMap.put("username", admin.getUsername());
-        String token = JwtUtils.getToken(map);
+        String token = JwtUtils.getToken(tokenMap);
 
         // 封装结果
         Map retMap = new HashMap();

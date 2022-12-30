@@ -25,6 +25,8 @@ dubbo:    #dubbo配置
   protocols:
     dubbo:
       port: -1
+  cloud:
+    subscribed-services: tanhua-dubbo-db, tanhua-dubbo-mongo
 
 #配置短信平台信息
 tanhua:  #手机验证码，咱们自己注册（不要白嫖）
