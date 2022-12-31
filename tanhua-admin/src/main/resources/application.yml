@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/tanhua-admin
     username: root
-    password: 1234
+    password: root
   rabbitmq:
     host: 192.168.136.160
     port: 5672
@@ -12,11 +12,11 @@ spring:
   redis:
     host: 192.168.136.160
     port: 6379
-  cloud:  #nacos配置
+  cloud: #nacos配置
     nacos:
       discovery:
         server-addr: 192.168.136.160:8848
-dubbo:    #dubbo配置
+dubbo: #dubbo配置
   registry:
     address: spring-cloud://localhost
   consumer:
@@ -29,7 +29,7 @@ dubbo:    #dubbo配置
     subscribed-services: tanhua-dubbo-db, tanhua-dubbo-mongo
 
 #配置短信平台信息
-tanhua:  #手机验证码，咱们自己注册（不要白嫖）
+tanhua: #手机验证码，咱们自己注册（不要白嫖）
   sms:
     signName: 物流云商
     templateCode: SMS_106590012
@@ -49,6 +49,11 @@ tanhua:  #手机验证码，咱们自己注册（不要白嫖）
     appKey: 1173221227168624#tanhua
     ClientId: YXA6FTjswNWvQ0CUku4I5tAnLQ
     secretKey: YXA6wcugZzJFxYE8zNr0svKhsraH27k
+  green:
+    enable: true
+    accessKeyID: LTAI4GKgob9vZ53k2SZdyAC7
+    accessKeySecret: LHLBvXmILRoyw0niRSBuXBZewQ30la
+    scenes: porn,terrorism #色情，暴力
 #mybaits-plus
 mybatis-plus:
   global-config:

@@ -3,6 +3,7 @@ package com.tanhua.autoconfig;
 
 import com.tanhua.autoconfig.properties.*;
 import com.tanhua.autoconfig.template.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -38,5 +39,11 @@ public class TanhuaAutoConfiguration {
     @Bean
     public HuanXinTemplate huanXinTemplate(HuanXinProperties huanXinProperties) {
         return new HuanXinTemplate(huanXinProperties);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "tanhua.green",value = "enable", havingValue = "true")
+    public AliyunGreenTemplate aliyunGreenTemplate(GreenProperties properties) {
+        return new AliyunGreenTemplate(properties);
     }
 }

@@ -15,6 +15,7 @@
         <module>tanhua-commons</module>
         <module>tanhua-app-server</module>
         <module>tanhua-gateway</module>
+        <module>tanhua-recommend</module>
     </modules>
 
     <parent>

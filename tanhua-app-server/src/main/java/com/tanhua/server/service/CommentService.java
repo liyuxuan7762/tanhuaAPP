@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tanhua.common.utils.Constants.*;
+import static com.tanhua.common.utils.LogOperationCodeConstants.*;
 
 @Service
 public class CommentService {
@@ -41,6 +42,9 @@ public class CommentService {
     @Resource
     private RedisTemplate<String, String> redisTemplate;
 
+    @Resource
+    private MqMessageService mqMessageService;
+
     /**
      * 根据动态id和评论正文 新增一条评论
      *
@@ -58,6 +62,9 @@ public class CommentService {
         newComment.setContent(comment);
         newComment.setUserId(UserHolder.getUserId());
         newComment.setCreated(System.currentTimeMillis());
+
+        this.mqMessageService.sendLogService(UserHolder.getUserId(), COMMENT_MOVEMENT, MESSAGE_MOVEMENT, movementId);
+
         // 5. 调用方法保存Comment, 并且返回保存后的评论数
         return this.commentApi.save(newComment, CommentType.COMMENT.getType());
     }
@@ -128,7 +135,9 @@ public class CommentService {
 //        String hashKey = MOVEMENT_LIKE_HASHKEY + userId;
 //        this.redisTemplate.opsForHash().put(key, hashKey, "1");
 //        // 5. 返回结果
-        return this.processLikeOrLove(movementId, CommentType.LIKE.getType(), true);
+        Integer count = this.processLikeOrLove(movementId, CommentType.LIKE.getType(), false);
+        this.mqMessageService.sendLogService(UserHolder.getUserId(), LIKE_MOVEMENT, MESSAGE_MOVEMENT, movementId);
+        return count;
     }
 
     /**
@@ -159,7 +168,9 @@ public class CommentService {
 //        this.redisTemplate.opsForHash().delete(key, hashKey);
 //        // 5. 返回结果
 //        return count;
-        return this.processLikeOrLove(movementId, CommentType.LIKE.getType(), false);
+        Integer count = this.processLikeOrLove(movementId, CommentType.LIKE.getType(), false);
+        this.mqMessageService.sendLogService(UserHolder.getUserId(), CANCEL_LIKE_MOVEMENT, MESSAGE_MOVEMENT, movementId);
+        return count;
     }
 
     /**
@@ -169,7 +180,9 @@ public class CommentService {
      * @return
      */
     public Integer love(String movementId) {
-        return this.processLikeOrLove(movementId, CommentType.LOVE.getType(), true);
+        Integer count = this.processLikeOrLove(movementId, CommentType.LIKE.getType(), false);
+        this.mqMessageService.sendLogService(UserHolder.getUserId(), LOVE_MOVEMENT, MESSAGE_MOVEMENT, movementId);
+        return count;
     }
 
     /**
@@ -178,7 +191,9 @@ public class CommentService {
      * @return
      */
     public Integer unlove(String movementId) {
-        return this.processLikeOrLove(movementId, CommentType.LOVE.getType(), false);
+        Integer count = this.processLikeOrLove(movementId, CommentType.LIKE.getType(), false);
+        this.mqMessageService.sendLogService(UserHolder.getUserId(), CANCEL_LOVE_MOVEMENT, MESSAGE_MOVEMENT, movementId);
+        return count;
     }
 
     /**

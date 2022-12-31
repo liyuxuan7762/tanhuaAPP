@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.tanhua.common.utils.Constants.*;
+import static com.tanhua.common.utils.LogOperationCodeConstants.*;
 
 @Service
 public class MomentService {
@@ -47,6 +48,9 @@ public class MomentService {
 
     @Resource
     private UserFreezeService userFreezeService;
+
+    @Resource
+    private  MqMessageService messageService;
 
 
     public void publish(Movement movement, MultipartFile[] files) throws IOException {
@@ -70,7 +74,11 @@ public class MomentService {
         // 3. 将图像文件URL设置到moment中
         movement.setMedias(imageUrlList);
         // 4. 调用api保存数据
-        this.movementApi.publish(movement);
+        String movementId = this.movementApi.publish(movement);
+        // 发送审核消息到消息队列
+        this.messageService.sendAudiService(movementId);
+        // 发送消息到推荐系统
+        this.messageService.sendLogService(UserHolder.getUserId(), PUBLISH_MOVEMENT, MESSAGE_MOVEMENT, movementId);
     }
 
     public PageResult getOwnMovement(Long userId, Integer page, Integer pagesize) {
@@ -184,6 +192,8 @@ public class MomentService {
         Long userId = movement.getUserId();
         UserInfo userInfo = this.userInfoApi.getUserInfoById(userId);
         // 3. 封装Vo对象
+        // 发送消息
+        this.messageService.sendLogService(UserHolder.getUserId(), BROWSE_MOVEMENT, MESSAGE_MOVEMENT, movement.getId().toString());
         return MovementsVo.init(userInfo, movement);
     }
 

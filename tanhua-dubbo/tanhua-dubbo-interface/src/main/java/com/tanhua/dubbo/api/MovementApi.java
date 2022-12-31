@@ -3,11 +3,12 @@ package com.tanhua.dubbo.api;
 import com.tanhua.model.mongo.Friend;
 import com.tanhua.model.mongo.Movement;
 import com.tanhua.model.vo.PageResult;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
 public interface MovementApi {
-    void publish(Movement movement);
+    String publish(Movement movement);
 
     List<Friend> getFriendListByUserId(Long userId);
 
@@ -26,4 +27,5 @@ public interface MovementApi {
     PageResult getMovementByUserId(Long uid, Integer state, Integer page, Integer pagesize);
 
 
+    void updateStatus(ObjectId id, int status);
 }

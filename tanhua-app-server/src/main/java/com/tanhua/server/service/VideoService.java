@@ -33,6 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.tanhua.common.utils.LogOperationCodeConstants.MESSAGE_VIDEO;
+import static com.tanhua.common.utils.LogOperationCodeConstants.PUBLISH_VIDEO;
+
 @Service
 public class VideoService {
 
@@ -56,6 +59,9 @@ public class VideoService {
 
     @DubboReference
     private FocusUserApi focusUserApi;
+
+    @Resource
+    private MqMessageService mqMessageService;
 
     /**
      * 发布小视频
@@ -90,6 +96,7 @@ public class VideoService {
         if (StringUtils.isEmpty(id)) {
             throw new BusinessException(ErrorResult.error());
         }
+        this.mqMessageService.sendLogService(UserHolder.getUserId(), PUBLISH_VIDEO, MESSAGE_VIDEO, id);
     }
 
     /**

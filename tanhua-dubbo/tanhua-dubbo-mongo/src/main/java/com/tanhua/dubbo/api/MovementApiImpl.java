@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Async;
 
 import javax.annotation.Resource;
@@ -31,7 +32,7 @@ public class MovementApiImpl implements MovementApi {
     private IdWorker idWorker;
 
     @Override
-    public void publish(Movement movement) {
+    public String publish(Movement movement) {
         try {
             // 1. 设置pid
             Long pid = idWorker.getNextId("movement");
@@ -44,11 +45,11 @@ public class MovementApiImpl implements MovementApi {
             // 4. 根据用户Id查找对应的好友id 这里直接查找了用户的所有好友，并没有考虑用户会设置动态对指定好友不可见的功能
             // 以异步的方式去写入时间写表
             saveTimeLine(movement, createTime);
+            return movement.getId().toHexString();
         } catch (Exception e) {
             // 保证事务
             throw new RuntimeException(e);
         }
-
     }
 
     /**
@@ -80,7 +81,7 @@ public class MovementApiImpl implements MovementApi {
 
     @Override
     public PageResult getMovementByUserId(Long userId, Integer page, Integer pagesize) {
-        Criteria criteria = Criteria.where("userId").is(userId);
+        Criteria criteria = Criteria.where("userId").is(userId).and("state").is(1);
         Query query = new Query(criteria);
         query.skip((page - 1) * pagesize).limit(pagesize).with(Sort.by(Sort.Order.desc("created")));
         List<Movement> movementList = this.mongoTemplate.find(query, Movement.class);
@@ -100,14 +101,14 @@ public class MovementApiImpl implements MovementApi {
         List<ObjectId> ids = CollUtil.getFieldValues(timeLineList, "movementId", ObjectId.class);
 
         // 根据userId查询到动态
-        Query queryMovement = new Query(Criteria.where("id").in(ids));
+        Query queryMovement = new Query(Criteria.where("id").in(ids).and("state").is(1));
 
         return this.mongoTemplate.find(queryMovement, Movement.class);
     }
 
     @Override
     public List<Movement> getMovementByPids(List<Long> pids) {
-        Criteria criteria = Criteria.where("pid").in(pids);
+        Criteria criteria = Criteria.where("pid").in(pids).and("state").is(1);
         Query query = new Query(criteria);
         return this.mongoTemplate.find(query, Movement.class);
     }
@@ -151,7 +152,13 @@ public class MovementApiImpl implements MovementApi {
         return new PageResult(page, pagesize, (int) count, movementList);
     }
 
-
+    @Override
+    public void updateStatus(ObjectId id, int status) {
+        Query query = new Query(Criteria.where("id").is(id));
+        Update update = new Update();
+        update.set("state", status);
+        this.mongoTemplate.updateFirst(query, update, Movement.class);
+    }
 
 
     @Override
