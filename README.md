@@ -23,7 +23,6 @@
 
 ## 4. 项目截图
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/5b6f134c86e644a3a0ff8d85e6f47434.png)!
-![在这里插入图片描述](https://img-blog.csdnimg.cn/1532b9d40d8e4434bd6121e54c0eb494.png)![在这里插入图片描述](https://img-blog.csdnimg.cn/edcb98aab6684893a89eced4f51906ca.png)
-
+![在这里插入图片描述](https://img-blog.csdnimg.cn/1532b9d40d8e4434bd6121e54c0eb494.png)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/69db6a5a5e88457f9b086b7d27127924.png)![在这里插入图片描述](https://img-blog.csdnimg.cn/e465d65526d94961ae1bf20a3bb4ef87.png)
 
